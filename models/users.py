@@ -12,7 +12,7 @@ class User(BaseModel):
     username = Column(String(40), unique=True, nullable=False)
     email = Column(String(40), unique=True, nullable=False)
     full_name = Column(String(40))
-    hashed_password = Column(String(50), nullable=False)
+    hashed_password = Column(String(150), nullable=False)
     phone_number = Column(String(20))
     address = Column(Text)
 
