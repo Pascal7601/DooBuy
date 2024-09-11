@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 from models.users import User
 
 
-
 load_dotenv()
 
 secret_key = os.getenv('SECRET_KEY')
@@ -46,14 +45,14 @@ def get_password_hash(password: str):
 def verify_password(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
-def authenticate_user(email: str, password: str, db: Session = Depends(get_db)):
+def authenticate_user(email: str, password: str, db: Session):
     """
     verifies a user before logging in
     """
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail='user not found')
-    if not verify_password(password, User.hashed_password):
+    if not verify_password(password, user.hashed_password):
         return {"message": "wrong password"}
     return user
 

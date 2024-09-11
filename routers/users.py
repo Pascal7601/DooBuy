@@ -5,6 +5,7 @@ from models.users import User
 from schemas import userSchema
 from typing import List
 from utils.auth.auth import get_password_hash
+from notifications.emails import send_registration_email
 
 
 router = APIRouter(prefix='/api/v1', tags=['users'])
@@ -42,7 +43,8 @@ async def add_user(user: userSchema.UserPostModel, db: Session = Depends(get_db)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return {'message': f'succesfully registered user_id {new_user.id} to our system'}
+    # send_registration_email(user.email, user.username) #only in production
+    return {'message': f'succesfully registered user_id {new_user.id} to our system, kindly check your email'}
 
 
 @router.put('/users/{email}', response_model=userSchema.UserResponseModel)

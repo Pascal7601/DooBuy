@@ -4,6 +4,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from models.products import Product
 from schemas import productSchema
+from sqlalchemy import select
 
 
 products_router = APIRouter(prefix='/api/v1/products', tags=['products'])
@@ -76,3 +77,16 @@ async def delete_product(name: str, db: Session = Depends(get_db)):
     db.delete(product)
     db.commit()
     return {'message': 'product succesfully deleted'}
+
+@products_router.get('/search/', response_model=List[productSchema.ProductResponseModel])
+async def search_product(query: str, db: Session = Depends(get_db)):
+    """
+    search for a specific product
+    """
+    product = select(Product).where(Product.name.ilike(f'%{query}%'))
+    result = db.execute(product).scalars().all()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='product not found'
+            )
+    return result
